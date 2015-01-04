@@ -1,24 +1,33 @@
+package com.Server;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
 
-import sun.tools.tree.ArrayAccessExpression;
+import com.sun.corba.se.spi.orb.StringPair;
 
 public class Server {
 	boolean started = false;
 	ServerSocket ss = null;
 	
+	private int port;
+	
 	ArrayList<MyClient> clients = new ArrayList<MyClient>();
 	
 	public static void main(String[] args) {
-		new Server().start();
+		new Server(8888);
+	}
+	
+	public Server(int port) {
+		this.port = port;
+		this.start();
 	}
 	
 	public void start() {
 		try {
-			ss = new ServerSocket(8888);
+			ss = new ServerSocket(port);
 			started = true;
 			System.out.println("端口已开启，占用8888端口号");
 		} catch (BindException e) {
@@ -77,8 +86,9 @@ public class Server {
 		public void run () {
 			try {
 				while (bConnected) {
-					String str = dis.readLine();
+					String str = dis.readUTF();
 					System.out.println (str);
+					
 					for (int i = 0; i<clients.size();i++) {
 						MyClient c = clients.get(i);
 						c.send(str);
