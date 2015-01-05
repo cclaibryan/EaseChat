@@ -1,4 +1,6 @@
 package com.Client;
+import com.Common.*;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -7,13 +9,20 @@ import java.net.*;
 @SuppressWarnings("serial")
 public class Client {
 	
+
 	public DataInputStream dis = null;
 	public DataOutputStream dos = null;
     private Socket s = null;
 
+
+    //server info
 	private String serverIp = null;
-	private String localIp;
 	private int serverPort = 8888;
+	
+	//client info
+	private String userName = null;
+	private String localIp;
+
 	boolean bConnected = false;
 	
 	Thread tRecv = null; 
@@ -44,6 +53,9 @@ public class Client {
 			dos = new DataOutputStream(s.getOutputStream());
 			dis = new DataInputStream(s.getInputStream());
 			
+			ClientInfo regisMessage = new ClientInfo();
+			//regisMessage.setUserName(Client.);
+			
 			System.out.println("connected!");
 			bConnected = true;
 			
@@ -66,9 +78,4 @@ public class Client {
 			e.printStackTrace();
 		}
 	}
-	
-	
-	
-	
-	
 }

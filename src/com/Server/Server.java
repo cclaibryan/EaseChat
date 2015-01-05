@@ -1,12 +1,13 @@
 package com.Server;
 
+import com.Common.ClientInfo;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
 
-import com.sun.corba.se.spi.orb.StringPair;
 
 public class Server {
 	boolean started = false;
@@ -15,6 +16,8 @@ public class Server {
 	private int port;
 	
 	ArrayList<MyClient> clients = new ArrayList<MyClient>();
+
+	ArrayList<ClientInfo> clientInfo = new ArrayList<ClientInfo>();
 	
 	public static void main(String[] args) {
 		new Server(8888);
@@ -63,6 +66,10 @@ public class Server {
 		private DataOutputStream dos = null;
 		private boolean bConnected = false;
 		
+		private String userName = null;
+		private String ip = null;
+		
+
 		public MyClient(Socket s) {
 			this.s = s;
 			try {
@@ -86,6 +93,7 @@ public class Server {
 		public void run () {
 			try {
 				while (bConnected) {
+
 					String str = dis.readUTF();
 					System.out.println (str);
 					
