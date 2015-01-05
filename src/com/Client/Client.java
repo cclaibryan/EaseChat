@@ -13,7 +13,7 @@ public class Client {
 
 	private String serverIp = null;
 	private String localIp;
-	private int serverPort = 6830;
+	private int serverPort = 8888;
 	boolean bConnected = false;
 	
 	Thread tRecv = null; 
@@ -35,17 +35,20 @@ public class Client {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		connect();
 	}
 	
 	public boolean connect() {
 		try {
+			System.out.println(serverIp);
 			s = new Socket(serverIp,serverPort);
 			dos = new DataOutputStream(s.getOutputStream());
 			dis = new DataInputStream(s.getInputStream());
 			
 			System.out.println("connected!");
 			bConnected = true;
+			
+			
+			
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

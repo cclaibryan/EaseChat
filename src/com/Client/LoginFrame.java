@@ -43,14 +43,16 @@ public class LoginFrame extends JFrame {
 		nameField = new JTextField(15);
 		nameField.setLocation(100, 20);
 		nameField.setSize(100, 20);
+		nameField.setText("Alice");
 		
 		serverLbl = new JLabel("Server ip:");
 		serverLbl.setSize(250, 100);
-		serverLbl.setLocation(30, 10);
+		serverLbl.setLocation(20, 10);
 		
 		serverField = new JTextField(15);
 		serverField.setLocation(100, 50);
-		serverField.setSize(100, 20);
+		serverField.setSize(120, 20);
+		serverField.setText("192.168.1.222");
 		
 		loginButton = new JButton("Log In");
 		loginButton.setSize(50, 20);
@@ -68,15 +70,16 @@ public class LoginFrame extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				String userNameStr = nameField.getText();
-				if (userNameStr != "Alice" && userNameStr != "Bob" &&
-					userNameStr != "Candy" && userNameStr != "Dog" && 
-					userNameStr != "Egg" ) {
+				if (!userNameStr.equals("Alice") && !userNameStr.equals("Bob") &&
+					!userNameStr.equals("Candy") && !userNameStr.equals("Dog") && 
+					!userNameStr.equals("Egg") ) {
 					tipLbl.setText("<html>Invalid User name! <br>User name can only be chosen from the <br>following names: Alice, Bob, Candy, Dog, Egg.</html>");
 					return;
 				}
 				else {
 						client = Client.getInstance();
 						client.setServerIp(serverField.getText());
+						client.connect();
 				}
 			}
 		});
