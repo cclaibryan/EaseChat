@@ -78,8 +78,10 @@ public class LoginFrame extends JFrame {
 				}
 				else {
 						client = Client.getInstance();
+						client.setUserName(userNameStr);
 						client.setServerIp(serverField.getText());
 						client.connect();
+						client.setChatFrame(new BasicFrame());
 				}
 			}
 		});

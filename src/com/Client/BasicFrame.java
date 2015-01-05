@@ -14,8 +14,8 @@ import com.Server.Server;
 /*The main chatting frame*/
 public class BasicFrame extends JFrame {
 	
-	private JTextField txtField = null;
-	private JTextArea txtArea = null;
+	public JTextField txtField = null;
+	public JTextArea txtArea = null;
 	private Client client;
 	
 	public BasicFrame() {
@@ -43,37 +43,17 @@ public class BasicFrame extends JFrame {
 		this.setVisible(true);
 		
 		txtField.requestFocus();	//txtField gets the focus
+		txtField.addActionListener(new TFListener());
 	}
 	
 	public class TFListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 			String str = txtField.getText().trim();
 			txtField.setText("");
-			
-			try {
-				client.dos.writeUTF(str);
-				client.dos.flush();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
+			txtArea.setText(txtArea.getText() + "Alice:\n" + str + '\n');
+			client.sendMsg(str);
 		}
 	}
 	
-	private class RecvThread implements Runnable {
-		
-		public void run () {
-			try {
-				while (client.bConnected) {
-					String str = client.dis.readUTF();
-					txtArea.setText(txtArea.getText() + str + '\n');
-				}
-			} catch (SocketException e) {
-				System.out.println("退出了,bye!");
-			} catch (EOFException e) {
-				System.out.println("退出了,bye!");
-			} catch (IOException e ) {
-				e.printStackTrace();
-			}				
-		}
-	}
+	
 }
