@@ -9,7 +9,6 @@ import java.net.*;
 import java.util.ArrayList;
 
 
-
 public class Server {
 	boolean started = false;
 	ServerSocket ss = null;
@@ -17,6 +16,7 @@ public class Server {
 	private int port;
 	
 	ArrayList<MyClient> clients = new ArrayList<MyClient>();
+
 	ArrayList<ClientInfo> clientInfo = new ArrayList<ClientInfo>();
 	
 	public static void main(String[] args) {
@@ -69,6 +69,7 @@ public class Server {
 		private String userName = null;
 		private String ip = null;
 		
+
 		public MyClient(Socket s) {
 			this.s = s;
 			try {
@@ -80,7 +81,7 @@ public class Server {
 			}
 		}
 		
-		public void send(Object obj,String str) {
+		public void send(String str) {
 			try {
 				dos.writeUTF(str);
 			} catch (IOException e) {
@@ -92,12 +93,13 @@ public class Server {
 		public void run () {
 			try {
 				while (bConnected) {
-					String currentClientInfo = dis.readUTF();
-					//System.out.println (str);
+
+					String str = dis.readUTF();
+					System.out.println (str);
 					
 					for (int i = 0; i<clients.size();i++) {
 						MyClient c = clients.get(i);
-						//c.send(str);
+						c.send(str);
 					}
 				}
 			} catch (EOFException e) {

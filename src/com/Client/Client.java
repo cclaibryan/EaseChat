@@ -1,5 +1,4 @@
 package com.Client;
-
 import com.Common.*;
 
 import java.awt.*;
@@ -10,10 +9,11 @@ import java.net.*;
 @SuppressWarnings("serial")
 public class Client {
 	
-	//socket and its streams
+
 	public DataInputStream dis = null;
 	public DataOutputStream dos = null;
     private Socket s = null;
+
 
     //server info
 	private String serverIp = null;
