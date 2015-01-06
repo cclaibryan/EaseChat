@@ -23,7 +23,7 @@ public class LoginFrame extends JFrame {
 	public JTextField serverField = null;
 	public JButton loginButton = null;
 	
-	private  Client client = null;
+	private  TcpClient client = null;
 	
 	public LoginFrame() {
 		this.setLocation(560,300);
@@ -69,19 +69,18 @@ public class LoginFrame extends JFrame {
 		loginButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				String userNameStr = nameField.getText();
-				if (!userNameStr.equals("Alice") && !userNameStr.equals("Bob") &&
-					!userNameStr.equals("Candy") && !userNameStr.equals("Dog") && 
-					!userNameStr.equals("Egg") ) {
+				System.out.println("1111111");
+				String userName = nameField.getText();
+				if (!userName.equals("Alice") && !userName.equals("Bob") &&
+					!userName.equals("Candy") && !userName.equals("Dog") && 
+					!userName.equals("Egg") ) {
 					tipLbl.setText("<html>Invalid User name! <br>User name can only be chosen from the <br>following names: Alice, Bob, Candy, Dog, Egg.</html>");
 					return;
 				}
 				else {
-						client = Client.getInstance();
-						client.setUserName(userNameStr);
-						client.setServerIp(serverField.getText());
+						client = new TcpClient(userName, serverField.getText());
 						client.connect();
-						client.setChatFrame(new BasicFrame());
+						new GroupChatFrame(userName,client);
 				}
 			}
 		});

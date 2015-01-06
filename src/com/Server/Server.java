@@ -1,9 +1,10 @@
 package com.Server;
 
+import com.Common.BasicInfo;
 import com.Common.ClientInfo;
+import com.Common.ClientInfoList;
+import com.Common.Msg;
 
-import java.awt.*;
-import java.awt.event.*;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
@@ -15,9 +16,8 @@ public class Server {
 	
 	private int port;
 	
-	ArrayList<MyClient> clients = new ArrayList<MyClient>();
-
-	ArrayList<ClientInfo> clientInfo = new ArrayList<ClientInfo>();
+	ArrayList<ClientOperation> clients = new ArrayList<ClientOperation>();	//operation threads list
+	ArrayList<ClientInfo> clientInfos = new ArrayList<ClientInfo>();		//user info list
 	
 	public static void main(String[] args) {
 		new Server(8888);
@@ -32,9 +32,9 @@ public class Server {
 		try {
 			ss = new ServerSocket(port);
 			started = true;
-			System.out.println("端口已开启，占用8888端口号");
+			System.out.println("occupied port 8888");
 		} catch (BindException e) {
-			System.out.println("端口使用中");
+			System.out.println("port being used!");
 			System.exit(0);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -43,7 +43,7 @@ public class Server {
 		try {
 			while (started) {
 				Socket s = ss.accept();
-				MyClient c = new MyClient(s);
+				ClientOperation c = new ClientOperation(s);
 				System.out.println("a client connected!");
 				
 				new Thread(c).start();
@@ -60,51 +60,90 @@ public class Server {
 		}
 	}
 	
-	class MyClient implements Runnable {
+	class ClientOperation implements Runnable {
 		private Socket s;
-		private DataInputStream dis = null;
-		private DataOutputStream dos = null;
+		private ObjectInputStream dis = null;
+		private ObjectOutputStream dos = null;
 		private boolean bConnected = false;
 		
 		private String userName = null;
 		private String ip = null;
-		
 
-		public MyClient(Socket s) {
+		public ClientOperation(Socket s) {
 			this.s = s;
 			try {
-				dis = new DataInputStream(s.getInputStream());
-				dos = new DataOutputStream(s.getOutputStream());
+				dis = new ObjectInputStream(new BufferedInputStream(s.getInputStream()));
+				dos = new ObjectOutputStream(s.getOutputStream());
 				bConnected = true;
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 		
-		public void send(String str) {
+		public void sendObject(Object obj) {
 			try {
-				dos.writeUTF(str);
+				dos.writeObject(obj);
 			} catch (IOException e) {
 				clients.remove(this);
-				System.out.println ("对方退出了！我从List里面去掉了！");
+				System.out.println ("User Logout!");
 			}
 		}
 		
 		public void run () {
 			try {
+				//receive user login information
 				while (bConnected) {
-
-					String str = dis.readUTF();
-					System.out.println (str);
-					
-					for (int i = 0; i<clients.size();i++) {
-						MyClient c = clients.get(i);
-						c.send(str);
+					BasicInfo recvTemp = (BasicInfo) dis.readObject();
+					System.out.println("Type is:" + recvTemp.getType());
+					switch (recvTemp.getType()) {
+						case 1:
+							ClientInfo infoTemp = (ClientInfo)recvTemp;
+							//record this user
+							this.userName = infoTemp.getUserName();
+							this.ip = infoTemp.getIp();
+							clientInfos.add(infoTemp);
+							
+							//send this user's login info to other users
+							ClientInfoList cList = new ClientInfoList();
+							cList.setClientInfos(clientInfos);
+							cList.setType(2);
+							
+							for (int i = 0; i< clients.size(); i++) {
+								ClientOperation tempClientOperation = clients.get(i);
+								tempClientOperation.sendObject(cList);
+							}
+							break;
+						case 0:
+							Msg msgTemp = (Msg) recvTemp;
+							
+							//console
+							String msg = msgTemp.getMsg();
+							String sender = msgTemp.getMsgSender();
+							System.out.println(sender + ": " + msg);
+							
+							for (int i = 0; i< clients.size(); i++) {
+								ClientOperation tempClientOperation = clients.get(i);
+								tempClientOperation.sendObject(msgTemp);
+							}
+							break;
+						default:
+							break;
 					}
+					System.out.println (userName + ' ' + ip + " connected!");
 				}
 			} catch (EOFException e) {
+				
+				for(int i = 0; i< clientInfos.size(); i++) {
+					ClientInfo temp  = clientInfos.get(i);
+					if (temp.getUserName().equals(this.userName))	
+						clientInfos.remove(i);
+				}
 				System.out.println("Client closed!");
+				
 			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} finally {
 				try {

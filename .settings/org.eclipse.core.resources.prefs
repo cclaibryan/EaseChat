@@ -1,4 +1,5 @@
 eclipse.preferences.version=1
-encoding//src/com/Client/BasicFrame.java=UTF-8
-encoding//src/com/Client/Client.java=UTF-8
+encoding//src/com/Client/GroupChatFrame.java=UTF-8
+encoding//src/com/Client/SingleChatFrame.java=UTF-8
+encoding//src/com/Client/TcpClient.java=UTF-8
 encoding//src/com/Server/Server.java=UTF-8
