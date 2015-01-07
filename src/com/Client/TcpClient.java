@@ -1,7 +1,6 @@
 package com.Client;
 import com.Common.*;
-import com.sun.tools.internal.xjc.model.CElementPropertyInfo.CollectionMode;
-import com.sun.tools.jdi.Packet;
+
 
 import java.awt.*;
 import java.awt.event.*;
@@ -9,7 +8,7 @@ import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
 
-import sun.nio.cs.ext.PCK;
+import javax.swing.DefaultListModel;
 
 /*
  * TcpCLient used for user to connect to server for group chat
@@ -28,6 +27,8 @@ public class TcpClient {
 	private String localIp;
 
 	private ArrayList<ClientInfo> infos = null;	//store login info for other users.
+	DefaultListModel nameListModel = new DefaultListModel(); //list of users for JList
+	
     public String receivedMsgs = new String();	//received messages
 	private Thread tRecvFromServer = null;	//monitor for server 
 	
@@ -55,21 +56,20 @@ public class TcpClient {
 		
 		try {
 			dos.writeObject(obj);
+			dos.reset();
 		} catch (IOException e) {
 			System.out.println ("对方退出了！我从List里面去掉了！");
 		}
 	}
 	
 	//send message to the group chat 
-	/*public void sendMsg(String str) {
+	public void sendMsg(String str) {
 		Msg msg = new Msg(str);
-		msg.setType(0);	//0 is msg
 		sendObject(msg);
-	}*/
+	}
 	
 	//connect to the server
 	public boolean connect() {
-		System.out.println("Connect");
 		try {
 			s = new Socket(serverIp,serverPort);
 			dos = new ObjectOutputStream(s.getOutputStream());
@@ -77,8 +77,6 @@ public class TcpClient {
 			
 			//construct and send my information
 			ClientInfo myInfo = new ClientInfo(userName,localIp,s.getPort());
-			myInfo.setType(1);	//1 is login info
-			System.out.println("Type(tcp):" + myInfo.getType());
 			sendObject(myInfo);
 			
 			bConnected = true;
@@ -114,21 +112,32 @@ public class TcpClient {
 		public void run () {
 			try {
 				while (bConnected) {
-					BasicInfo recvTemp = (BasicInfo) dis.readObject();
-					switch (recvTemp.getType()) {
-						case 0:
-							Msg msgTemp = (Msg) recvTemp;
-							String msg = msgTemp.getMsg();
-							String sender = msgTemp.getMsgSender();
-							receivedMsgs += msg;
-							break;
-						case 2:
-							ClientInfoList listTemp = (ClientInfoList)recvTemp;
-							infos = listTemp.getClientInfos();
-							break;
-						default:
-							break;
+					Object recvTemp =  dis.readObject();
+					String className = recvTemp.getClass().getName();
+					
+					if (className.equals("com.Common.Msg")) {
+						Msg msgTemp = (Msg) recvTemp;
+						String msg = msgTemp.getMsg();
+						String sender = msgTemp.getMsgSender();
+						receivedMsgs += msg;
+						System.out.println("msg received!");
+					} 
+					else if (className.equals("com.Common.ClientInfoList")) {
+						ClientInfoList listTemp = (ClientInfoList)recvTemp;
+						infos = listTemp.getClientInfos();
+						
+						System.out.println("Object:\n");
+						
+						for(int i = 0;i<infos.size(); i++) {
+							System.out.println(infos.get(i).getUserName() + " " + infos.get(i).getIp());
+						}
+						
+						nameListModel.clear();
+						for(int i = 0; i<infos.size(); i++) 
+							nameListModel.addElement(infos.get(i).getUserName());
 					}
+					
+					else System.out.println("unresolved type!");
 				}
 			} catch (SocketException e) {
 				System.out.println("退出了,bye!");

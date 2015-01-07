@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 	/*clients register on the server*/
 @SuppressWarnings("serial")
-public class ClientInfo extends BasicInfo implements Serializable{
+public class ClientInfo implements Serializable{
 	private String userName;
 	private String ip;
 	private int port;
@@ -12,6 +12,7 @@ public class ClientInfo extends BasicInfo implements Serializable{
 	public ClientInfo() {}
 		
 	public ClientInfo(String userName, String ip, int port) {
+		super();
 		this.userName = userName;
 		this.ip = ip;
 		this.port = port;

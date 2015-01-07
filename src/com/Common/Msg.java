@@ -2,9 +2,8 @@ package com.Common;
 
 import java.io.Serializable;
 
-import sun.security.action.GetBooleanAction;
 
-public class Msg extends BasicInfo implements Serializable {
+public class Msg implements Serializable {
 	private String msg;
 	private String msgSender;
 	

@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Insets;
+import java.awt.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.EOFException;
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.net.SocketException;
 import java.util.ArrayList;
 
+import javax.management.modelmbean.ModelMBean;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
@@ -30,6 +32,8 @@ public class GroupChatFrame extends JFrame {
 	private TcpClient client;
 	
 	private String userName = null;		//my name
+	
+	
 	
 	public GroupChatFrame(String name,TcpClient client) {
 		super(name);
@@ -57,7 +61,7 @@ public class GroupChatFrame extends JFrame {
 		txtArea.setAutoscrolls(true);
 		txtArea.setEditable(false);
 		
-		nameList = new JList(new DataModel(client.getInfos()));
+		nameList = new JList(client.nameListModel);
 		nameList.setSize(100,300);
 		nameList.setLocation(0, 0);
 		nameList.setBorder(new LineBorder(Color.black));
@@ -77,29 +81,12 @@ public class GroupChatFrame extends JFrame {
 		txtField.addActionListener(new TFListener());
 	}
 	
-	@SuppressWarnings("serial")
-	public class DataModel extends AbstractListModel {
-		ArrayList<ClientInfo> infos = null;
-		
-		public DataModel(ArrayList<ClientInfo> infos) {
-			this.infos = infos;
-		}
-		@Override
-		public Object getElementAt(int arg0) {
-			return infos.get(arg0);
-		}
-
-		@Override
-		public int getSize() {
-			return infos.size();
-		}	
-	}
-	
 	public class TFListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 			String str = txtField.getText().trim();
 			txtField.setText("");
 			txtArea.setText(txtArea.getText() + userName + ":\n" + str + '\n');
+			
 			//client.sendMsg(str);
 		}
 	}

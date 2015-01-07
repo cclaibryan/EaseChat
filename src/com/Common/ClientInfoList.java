@@ -3,7 +3,7 @@ package com.Common;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public class ClientInfoList extends BasicInfo implements Serializable {
+public class ClientInfoList implements Serializable {
 	private ArrayList<ClientInfo> clientInfos;
 
 	public ArrayList<ClientInfo> getClientInfos() {

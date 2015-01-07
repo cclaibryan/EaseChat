@@ -52,7 +52,7 @@ public class LoginFrame extends JFrame {
 		serverField = new JTextField(15);
 		serverField.setLocation(100, 50);
 		serverField.setSize(120, 20);
-		serverField.setText("192.168.1.222");
+		serverField.setText("192.168.1.204");
 		
 		loginButton = new JButton("Log In");
 		loginButton.setSize(50, 20);
@@ -69,7 +69,6 @@ public class LoginFrame extends JFrame {
 		loginButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				System.out.println("1111111");
 				String userName = nameField.getText();
 				if (!userName.equals("Alice") && !userName.equals("Bob") &&
 					!userName.equals("Candy") && !userName.equals("Dog") && 
