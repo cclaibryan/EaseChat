@@ -17,7 +17,6 @@ import javax.swing.SwingUtilities;
 public class LoginFrame extends JFrame {
 
 	public JLabel nameLbl = null;
-	public JLabel tipLbl = null;
 	public JTextField nameField = null;
 	public JLabel serverLbl = null;
 	public JTextField serverField = null;
@@ -35,10 +34,6 @@ public class LoginFrame extends JFrame {
 		nameLbl = new JLabel("User Name:");
 		nameLbl.setLocation(20, 20);
 		nameLbl.setSize(80, 20);
-		
-		tipLbl = new JLabel("<html>User name can only be chosen from the <br>following names: Alice, Bob, Candy, Dog, Egg.</html>");
-		tipLbl.setSize(250, 100);
-		tipLbl.setLocation(30, 80);
 		
 		nameField = new JTextField(15);
 		nameField.setLocation(100, 20);
@@ -63,24 +58,16 @@ public class LoginFrame extends JFrame {
 		this.add(loginButton);
 		this.add(serverLbl);
 		this.add(serverField);
-		this.add(tipLbl);
 		this.setVisible(true);
 		
 		loginButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				String userName = nameField.getText();
-				if (!userName.equals("Alice") && !userName.equals("Bob") &&
-					!userName.equals("Candy") && !userName.equals("Dog") && 
-					!userName.equals("Egg") ) {
-					tipLbl.setText("<html>Invalid User name! <br>User name can only be chosen from the <br>following names: Alice, Bob, Candy, Dog, Egg.</html>");
-					return;
-				}
-				else {
-						client = new TcpClient(userName, serverField.getText());
-						client.connect();
-						new GroupChatFrame(userName,client);
-				}
+				client = new TcpClient(userName, serverField.getText());
+				client.connect();
+				GroupChatFrame chatFrame = new GroupChatFrame(userName,client);
+				client.setChatFrame(chatFrame);
 			}
 		});
 	}

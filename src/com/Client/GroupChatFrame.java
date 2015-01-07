@@ -58,6 +58,7 @@ public class GroupChatFrame extends JFrame {
 		txtArea.setSize(100, 100);
 		txtArea.setLocation(0, 0);
 		txtArea.setRows(15);
+		txtArea.validate();
 		txtArea.setAutoscrolls(true);
 		txtArea.setEditable(false);
 		
@@ -85,9 +86,8 @@ public class GroupChatFrame extends JFrame {
 		public void actionPerformed(ActionEvent e) {
 			String str = txtField.getText().trim();
 			txtField.setText("");
-			txtArea.setText(txtArea.getText() + userName + ":\n" + str + '\n');
-			
-			//client.sendMsg(str);
+			//txtArea.setText(txtArea.getText() + userName + ":\n" + str + '\n');
+			client.sendMsg(str,userName);
 		}
 	}
 	

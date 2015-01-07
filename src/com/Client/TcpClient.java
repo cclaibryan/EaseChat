@@ -32,6 +32,8 @@ public class TcpClient {
     public String receivedMsgs = new String();	//received messages
 	private Thread tRecvFromServer = null;	//monitor for server 
 	
+	GroupChatFrame chatFrame = null;
+	
 	boolean bConnected = false;
 	
 	public ArrayList<ClientInfo> getInfos() {
@@ -51,6 +53,10 @@ public class TcpClient {
 		} 
 	}
 	
+	public void setChatFrame(GroupChatFrame chatFrame) {
+		this.chatFrame = chatFrame;
+	}
+	
 	//send my login in information to the server
 	public void sendObject(Object obj) {
 		
@@ -63,8 +69,8 @@ public class TcpClient {
 	}
 	
 	//send message to the group chat 
-	public void sendMsg(String str) {
-		Msg msg = new Msg(str);
+	public void sendMsg(String str, String msgSender) {
+		Msg msg = new Msg(str,msgSender);
 		sendObject(msg);
 	}
 	
@@ -119,8 +125,7 @@ public class TcpClient {
 						Msg msgTemp = (Msg) recvTemp;
 						String msg = msgTemp.getMsg();
 						String sender = msgTemp.getMsgSender();
-						receivedMsgs += msg;
-						System.out.println("msg received!");
+						chatFrame.txtArea.setText(chatFrame.txtArea.getText() + sender + ":\n" + msg + '\n');
 					} 
 					else if (className.equals("com.Common.ClientInfoList")) {
 						ClientInfoList listTemp = (ClientInfoList)recvTemp;

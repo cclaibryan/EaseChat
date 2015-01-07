@@ -9,8 +9,9 @@ public class Msg implements Serializable {
 	
 	public Msg() {}
 	
-	public Msg(String msg) {
+	public Msg(String msg,String msgSender) {
 		this.msg = msg;
+		this.msgSender = msgSender;
 	}
 	
 	public String getMsg() {

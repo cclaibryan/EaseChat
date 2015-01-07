@@ -81,17 +81,18 @@ public class Server {
 		
 		public void sendObject(Object obj) {
 			try {
-				System.out.println("Object:\n");
-				ClientInfoList temp = (ClientInfoList)obj;
-				for(int i = 0;i<temp.getClientInfos().size(); i++) {
-					System.out.println(temp.getClientInfos().get(i).getUserName() + " " + temp.getClientInfos().get(i).getIp());
-				}
-				
 				dos.writeObject(obj);
 				dos.reset();
 			} catch (IOException e) {
 				clients.remove(this);
 				System.out.println ("User Logout!");
+			}
+		}
+		
+		public void groupSending(Object obj) {
+			for (int i = 0; i< clients.size(); i++) {
+				ClientOperation tempClientOperation = clients.get(i);
+				tempClientOperation.sendObject(obj);
 			}
 		}
 		
@@ -109,10 +110,7 @@ public class Server {
 						String sender = msgTemp.getMsgSender();
 						System.out.println(sender + ": " + msg);
 						
-						for (int i = 0; i< clients.size(); i++) {
-							ClientOperation tempClientOperation = clients.get(i);
-							tempClientOperation.sendObject(msgTemp);
-						}
+						groupSending(msgTemp);
 					} 
 					else if (className.equals("com.Common.ClientInfo")) {
 						ClientInfo infoTemp = (ClientInfo)recvTemp;
@@ -125,10 +123,7 @@ public class Server {
 						ClientInfoList cList = new ClientInfoList();
 						cList.setClientInfos(clientInfos);
 						
-						for (int i = 0; i< clients.size(); i++) {
-							ClientOperation tempClientOperation = clients.get(i);
-							tempClientOperation.sendObject(cList);
-						}
+						groupSending(cList);
 					}
 					else System.out.println("unresolved type!");
 				}
@@ -139,6 +134,10 @@ public class Server {
 					if (temp.getUserName().equals(this.userName))	
 						clientInfos.remove(i);
 				}
+				//update the user login information
+				ClientInfoList cList = new ClientInfoList();
+				cList.setClientInfos(clientInfos);
+				groupSending(cList);
 				System.out.println("Client closed!");
 				
 			} catch (IOException e) {
