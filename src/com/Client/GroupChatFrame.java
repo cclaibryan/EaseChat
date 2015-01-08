@@ -8,6 +8,8 @@ import java.awt.Insets;
 import java.awt.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.EOFException;
 import java.io.IOException;
 import java.net.SocketException;
@@ -47,6 +49,7 @@ public class GroupChatFrame extends JFrame {
 		this.client = client;
 		
 		this.setMainFrame();
+		
 	}
 	
 	private void setMainFrame() {
@@ -80,6 +83,14 @@ public class GroupChatFrame extends JFrame {
 		
 		txtField.requestFocus();	//txtField gets the focus
 		txtField.addActionListener(new TFListener());
+		
+		this.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent arg0) {
+				client.disconnect();
+				System.exit(0);
+			}
+		});
 	}
 	
 	public class TFListener implements ActionListener {
@@ -90,6 +101,4 @@ public class GroupChatFrame extends JFrame {
 			client.sendMsg(str,userName);
 		}
 	}
-	
-	
 }

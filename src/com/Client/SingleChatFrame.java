@@ -1,6 +1,10 @@
 package com.Client;
 
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.EOFException;
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -22,9 +26,12 @@ public class SingleChatFrame extends JFrame {
 	public JTextArea txtArea = null;
 	public JScrollPane scrollPane = null;
 	
+	UdpClient client = null;
+	public String userName;
+	
 	public SingleChatFrame(String name) {
 		super(name);
-		
+		this.userName = name;
 		this.setLocation(560,300);
 		this.setSize(450,300);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -56,28 +63,25 @@ public class SingleChatFrame extends JFrame {
 		this.setVisible(true);
 		
 		txtField.requestFocus();	//txtField gets the focus
+		
+		this.txtField.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				String contentString = txtField.getText();
+				txtField.setText("");
+				txtArea.setText(txtArea.getText() + userName + ":\n" + contentString + "\n");
+			}
+		});
+		
+		this.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent arg0) {
+				System.exit(0);
+			}
+		});
 	}
 	
-	private class RecvFromUserThread implements Runnable {
-		
-		public void run () {
-			try {
-				dsRecv = new DatagramSocket(55555);	//monitor 55555 port
-				recvPacket = new DatagramPacket(buffer, buffer.length);
-				while (bConnected) {
-				    dsRecv.receive(recvPacket);
-				    System.out.println(recvPacket.getData());
-				    chatFrame.txtArea.setText(chatFrame.txtArea.getText() + "Bob:\n" + new String(recvPacket.getData(),0,recvPacket.getLength()) + '\n');
-				}
-			} catch (SocketException e) {
-				System.out.println("退出了,bye!");
-			} catch (EOFException e) {
-				System.out.println("退出了,bye!");
-			} catch (IOException e ) {
-				e.printStackTrace();
-			} 			
-		}
-	}
+	
 	public static void main(String[] args) {
 		new SingleChatFrame("Alice -> Bob");
 

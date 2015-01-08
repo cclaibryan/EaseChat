@@ -3,6 +3,8 @@ package com.Client;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -47,7 +49,7 @@ public class LoginFrame extends JFrame {
 		serverField = new JTextField(15);
 		serverField.setLocation(100, 50);
 		serverField.setSize(120, 20);
-		serverField.setText("192.168.1.204");
+		serverField.setText("127.0.0.1");
 		
 		loginButton = new JButton("Log In");
 		loginButton.setSize(50, 20);
@@ -68,6 +70,13 @@ public class LoginFrame extends JFrame {
 				client.connect();
 				GroupChatFrame chatFrame = new GroupChatFrame(userName,client);
 				client.setChatFrame(chatFrame);
+			}
+		});
+		
+		this.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent arg0) {
+				System.exit(0);
 			}
 		});
 	}

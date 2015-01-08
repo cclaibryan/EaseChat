@@ -1,5 +1,6 @@
 package com.Client;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -22,8 +23,7 @@ public class UdpClient {
     //IP and port information
     String myIp = null;
     String hisIp = null;
-    int myPort = -1;
-    int hisPort = -1;
+    int port = -1;
     
   //received messages and buffer
     public String receivedMsgs = new String();
@@ -54,6 +54,27 @@ public class UdpClient {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+	}
+    
+    private class RecvFromUserThread implements Runnable {
+	
+		public void run () {
+			try {
+				dsRecv = new DatagramSocket(55555);	//monitor 55555 port
+				recvPacket = new DatagramPacket(buffer, buffer.length);
+				while (bConnected) {
+				    dsRecv.receive(recvPacket);
+				    System.out.println(recvPacket.getData());
+				    chatFrame.txtArea.setText(chatFrame.txtArea.getText() + "Bob:\n" + new String(recvPacket.getData(),0,recvPacket.getLength()) + '\n');
+				}
+			} catch (SocketException e) {
+				System.out.println("退出了,bye!");
+			} catch (EOFException e) {
+				System.out.println("退出了,bye!");
+			} catch (IOException e ) {
+				e.printStackTrace();
+			} 			
 		}
 	}
 }
