@@ -26,7 +26,7 @@ public class TcpClient {
 	private String userName = null;
 	private String localIp;
 
-	private ArrayList<ClientInfo> infos = null;	//store login info for other users.
+	public ArrayList<ClientInfo> infos = null;	//store login info for other users.
 	DefaultListModel nameListModel = new DefaultListModel(); //list of users for JList
 	
     public String receivedMsgs = new String();	//received messages
@@ -64,7 +64,7 @@ public class TcpClient {
 			dos.writeObject(obj);
 			dos.reset();
 		} catch (IOException e) {
-			System.out.println ("对方退出了！我从List里面去掉了！");
+			System.out.println ("Peer leaved");
 		}
 	}
 	
@@ -131,23 +131,15 @@ public class TcpClient {
 						ClientInfoList listTemp = (ClientInfoList)recvTemp;
 						infos = listTemp.getClientInfos();
 						
-						System.out.println("Object:\n");
-						
-						for(int i = 0;i<infos.size(); i++) {
-							System.out.println(infos.get(i).getUserName() + " " + infos.get(i).getIp());
-						}
-						
 						nameListModel.clear();
 						for(int i = 0; i<infos.size(); i++) 
 							nameListModel.addElement(infos.get(i).getUserName());
 					}
-					
-					else System.out.println("unresolved type!");
 				}
 			} catch (SocketException e) {
-				System.out.println("退出了,bye!");
+				System.out.println("Exit. Bye!");
 			} catch (EOFException e) {
-				System.out.println("退出了,bye!");
+				System.out.println("Exit. Bye!");
 			} catch (IOException e ) {
 				e.printStackTrace();
 			} catch (ClassNotFoundException e) {

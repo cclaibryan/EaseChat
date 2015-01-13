@@ -24,7 +24,6 @@ public class LoginFrame extends JFrame {
 	public JTextField serverField = null;
 	public JButton loginButton = null;
 	
-	private  TcpClient client = null;
 	
 	public LoginFrame() {
 		this.setLocation(560,300);
@@ -49,7 +48,7 @@ public class LoginFrame extends JFrame {
 		serverField = new JTextField(15);
 		serverField.setLocation(100, 50);
 		serverField.setSize(120, 20);
-		serverField.setText("127.0.0.1");
+		serverField.setText("192.168.1.204");
 		
 		loginButton = new JButton("Log In");
 		loginButton.setSize(50, 20);
@@ -65,11 +64,8 @@ public class LoginFrame extends JFrame {
 		loginButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				String userName = nameField.getText();
-				client = new TcpClient(userName, serverField.getText());
-				client.connect();
-				GroupChatFrame chatFrame = new GroupChatFrame(userName,client);
-				client.setChatFrame(chatFrame);
+				new GroupChatFrame(nameField.getText(),serverField.getText());
+				
 			}
 		});
 		

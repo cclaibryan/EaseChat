@@ -1,46 +1,49 @@
 package com.Client;
 
-import java.awt.Color;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.EOFException;
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.SocketException;
-
-import javax.swing.JFrame;
-import javax.swing.JList;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
+import java.io.*;
+import java.net.*;
+import javax.swing.*;
 import javax.swing.border.LineBorder;
 
-import com.Client.GroupChatFrame.TFListener;
+import com.Common.Msg;
 
 public class SingleChatFrame extends JFrame {
 
-	public JTextField txtField = null;
-	public JTextArea txtArea = null;
-	public JScrollPane scrollPane = null;
+	public JTextField txtField;
+	public JTextArea txtArea;
+	public JScrollPane scrollPane;
 	
-	UdpClient client = null;
-	public String userName;
+	String userName;	//my name
+	int userPort;		//my port
+	String peerName;	//peer's name
+	String peerIp;		//peer's ip
+	int peerPort = 0;	//peer's port
 	
-	public SingleChatFrame(String name) {
-		super(name);
-		this.userName = name;
+	UdpClient client;
+	boolean infoIsSent = false;
+	
+	public SingleChatFrame(String userName, String peerName, String peerIp, int port) {
+		super(String.format("%s---->%s", userName,peerName));
+		this.userName = userName;	//my name
+		this.userPort = port;		//my port
+		this.peerName = peerName;	//peer's name
+		this.peerIp = peerIp;		//peer's ip
+		
+		client = new UdpClient(userName,userPort,peerName,peerIp,0,this);
+		this.setMainFrame();
+	}
+	
+	private void setMainFrame() {
 		this.setLocation(560,300);
 		this.setSize(450,300);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setLayout(null);
 		
-		this.setMainFrame();
-	}
-	
-	private void setMainFrame() {
 		txtField = new JTextField();
 		txtField.setSize(452, 30);
 		txtField.setLocation(0, 250);
@@ -68,6 +71,7 @@ public class SingleChatFrame extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				String contentString = txtField.getText();
+				client.sendMsg(contentString);
 				txtField.setText("");
 				txtArea.setText(txtArea.getText() + userName + ":\n" + contentString + "\n");
 			}
@@ -81,10 +85,8 @@ public class SingleChatFrame extends JFrame {
 		});
 	}
 	
-	
-	public static void main(String[] args) {
-		new SingleChatFrame("Alice -> Bob");
-
+	void setPeerPort(int port) {
+		this.peerPort = port;
+		client.peerPort = port;
 	}
-
 }
