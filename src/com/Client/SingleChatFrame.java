@@ -25,14 +25,16 @@ public class SingleChatFrame extends JFrame {
 	int peerPort = 0;	//peer's port
 	
 	UdpClient client;
+	GroupChatFrame groupChatFrame;
 	boolean infoIsSent = false;
 	
-	public SingleChatFrame(String userName, String peerName, String peerIp, int port) {
+	public SingleChatFrame(String userName, String peerName, String peerIp, int port,GroupChatFrame chatFrame) {
 		super(String.format("%s---->%s", userName,peerName));
 		this.userName = userName;	//my name
 		this.userPort = port;		//my port
 		this.peerName = peerName;	//peer's name
 		this.peerIp = peerIp;		//peer's ip
+		this.groupChatFrame = chatFrame;
 		
 		client = new UdpClient(userName,userPort,peerName,peerIp,0,this);
 		this.setMainFrame();
@@ -41,7 +43,6 @@ public class SingleChatFrame extends JFrame {
 	private void setMainFrame() {
 		this.setLocation(560,300);
 		this.setSize(450,300);
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setLayout(null);
 		
 		txtField = new JTextField();
@@ -73,14 +74,24 @@ public class SingleChatFrame extends JFrame {
 				String contentString = txtField.getText();
 				client.sendMsg(contentString);
 				txtField.setText("");
-				txtArea.setText(txtArea.getText() + userName + ":\n" + contentString + "\n");
+				txtArea.setText(txtArea.getText() + userName + ":\n    " + contentString + "\n");
+				txtArea.setCaretPosition(txtArea.getText().length());  //scroll to bottom
 			}
 		});
 		
 		this.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent arg0) {
-				System.exit(0);
+				client.disconnect(true);
+				
+				for(int i = 0;i<groupChatFrame.singleChatFramesList.size();i++) {
+					SingleChatFrame tempChatFrame = groupChatFrame.singleChatFramesList.get(i);
+					if (tempChatFrame.peerName.equals(peerName) && tempChatFrame.userName.equals(userName)) {
+						groupChatFrame.singleChatFramesList.remove(i);
+						break;
+					}
+				}
+				dispose();
 			}
 		});
 	}

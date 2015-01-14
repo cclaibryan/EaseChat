@@ -67,7 +67,6 @@ public class GroupChatFrame extends JFrame {
 	private void setMainFrame() {
 		this.setLocation(560,300);
 		this.setSize(450,300);
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setLayout(null);
 		
 		txtField = new JTextField();
@@ -105,6 +104,7 @@ public class GroupChatFrame extends JFrame {
 				String str = txtField.getText().trim();
 				txtField.setText("");
 				tcpClient.sendMsg(str,userName);
+				txtArea.setCaretPosition(txtArea.getText().length());  //scroll to bottom
 			}
 		});
 		
@@ -112,7 +112,15 @@ public class GroupChatFrame extends JFrame {
 			@Override
 			public void windowClosing(WindowEvent arg0) {
 				tcpClient.disconnect();
-				System.exit(0);
+				udpClient.disconnect(false);
+				
+				//dispose all the single chat frames
+				for(int i = 0;i<singleChatFramesList.size();i++) {
+					SingleChatFrame tempChatFrame = singleChatFramesList.get(i);
+					tempChatFrame.client.disconnect(true);
+					tempChatFrame.dispose();
+				}
+				dispose();	//dispose group chat frame
 			}
 		});
 		
@@ -156,14 +164,14 @@ public class GroupChatFrame extends JFrame {
 		System.out.println("num:" + singleChatFramesList.size());
 		for (int i = 0; i< singleChatFramesList.size(); i++) {
 			SingleChatFrame temp = singleChatFramesList.get(i);
-			if (temp.userName.equals(userName) && temp.peerName.equals(peerName)) return temp;
+			if (temp.peerName.equals(peerName)) return temp;
 		}
 		
 		int randomNum = (int) (Math.random() * 5000);
 		while (portSet[randomNum] == true) 
 			randomNum = (int) (Math.random() * 5000);
 		portSet[randomNum] = true;
-		SingleChatFrame tempChatFrame = new SingleChatFrame(userName, peerName, peerIp, randomNum + 20000);
+		SingleChatFrame tempChatFrame = new SingleChatFrame(userName, peerName, peerIp, randomNum + 20000,this);
 		singleChatFramesList.add(tempChatFrame);
 		
 		if (isShown) tempChatFrame.setVisible(true);

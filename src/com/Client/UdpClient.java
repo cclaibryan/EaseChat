@@ -15,6 +15,8 @@ import java.net.UnknownHostException;
 import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
 import javax.xml.ws.handler.MessageContext;
 
+import org.omg.PortableServer.THREAD_POLICY_ID;
+
 import com.Common.ClientInfo;
 import com.Common.Msg;
 
@@ -129,12 +131,25 @@ public class UdpClient {
 		}
     }
     
+    public void disconnect(boolean sendEndingInfo) {
+    	
+    	//sending ending info
+    	if (sendEndingInfo) {
+	    	ClientInfo endInfo = new ClientInfo(userName,"0.0.0.0",userPort);
+	    	sendObj(endInfo, 55555);
+    	}
+    	
+    	dsRecv.close();
+		dsSend.close();
+		tRecvFromUser.interrupt();
+	}
+    
     private class RecvFromPeerThread implements Runnable {
-	
+    	
     	@SuppressWarnings("unchecked")
 		public void run () {
 			try {
-				while (bConnected) {
+				while (bConnected && (!Thread.interrupted())) {
 				    dsRecv.receive(recvPacket);
 				    
 				    ByteArrayInputStream bint=new ByteArrayInputStream(recvPacket.getData());  
@@ -148,16 +163,33 @@ public class UdpClient {
 							String msg = msgTemp.getMsg();
 							String sender = msgTemp.getMsgSender();
 							singleChatFrame.setVisible(true);	//pop out the chat frame
-							singleChatFrame.txtArea.setText(singleChatFrame.txtArea.getText() + sender + ":\n" + msg + '\n');
+							singleChatFrame.txtArea.setText(singleChatFrame.txtArea.getText() + sender + ":\n    " + msg + '\n');
 						}
 						else if (className.equals("com.Common.ClientInfo")) {	//only udpClient of GroupChatFrame can receive this 
 							ClientInfo info = (ClientInfo)message;
-							SingleChatFrame tempChatFrame = groupChatFrame.addSingleChatFrame(userName, info.getUserName(), info.getIp(),false);
-							tempChatFrame.setPeerPort(info.getPort());	//set peer's port
+							String name = info.getUserName();
+							String ip = info.getIp();
 							
-							if (tempChatFrame.infoIsSent == false) {	//reply my client info
-								tempChatFrame.client.sendInfo();
-								tempChatFrame.infoIsSent = true;
+							if (ip.equals("0.0.0.0")) {	//peer sending ending info. Dispose mine
+								for (int i = 0;i< groupChatFrame.singleChatFramesList.size();i++) {
+									SingleChatFrame temp = groupChatFrame.singleChatFramesList.get(i);
+									if (temp.peerName.equals(name)) {
+										temp.client.disconnect(false);
+										temp.dispose();
+										groupChatFrame.singleChatFramesList.remove(i);
+										break;
+									}
+								}
+							}
+							else {
+								System.out.println("Hello!");
+								SingleChatFrame tempChatFrame = groupChatFrame.addSingleChatFrame(userName, name, ip,false);
+								tempChatFrame.setPeerPort(info.getPort());	//set peer's port
+								
+								if (tempChatFrame.infoIsSent == false) {	//reply my client info
+									tempChatFrame.client.sendInfo();
+									tempChatFrame.infoIsSent = true;
+								}
 							}
 						}
 					} catch (ClassNotFoundException e) {

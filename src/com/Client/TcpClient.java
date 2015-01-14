@@ -106,6 +106,7 @@ public class TcpClient {
 			dos.close();
 			dis.close();
 			s.close();
+			tRecvFromServer.interrupt();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -117,7 +118,7 @@ public class TcpClient {
 		@SuppressWarnings("unchecked")
 		public void run () {
 			try {
-				while (bConnected) {
+				while (bConnected && (!Thread.interrupted())) {
 					Object recvTemp =  dis.readObject();
 					String className = recvTemp.getClass().getName();
 					
@@ -125,7 +126,7 @@ public class TcpClient {
 						Msg msgTemp = (Msg) recvTemp;
 						String msg = msgTemp.getMsg();
 						String sender = msgTemp.getMsgSender();
-						chatFrame.txtArea.setText(chatFrame.txtArea.getText() + sender + ":\n" + msg + '\n');
+						chatFrame.txtArea.setText(chatFrame.txtArea.getText() + sender + ":\n    " + msg + '\n');
 					} 
 					else if (className.equals("com.Common.ClientInfoList")) {
 						ClientInfoList listTemp = (ClientInfoList)recvTemp;

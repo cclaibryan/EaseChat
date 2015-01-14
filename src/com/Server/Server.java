@@ -71,6 +71,7 @@ public class Server {
 		public ClientOperation(Socket s) {
 			this.s = s;
 			try {
+				System.out.println("new dos and dis!");
 				dis = new ObjectInputStream(new BufferedInputStream(s.getInputStream()));
 				dos = new ObjectOutputStream(s.getOutputStream());
 				bConnected = true;
@@ -84,7 +85,7 @@ public class Server {
 				dos.writeObject(obj);
 				dos.reset();
 			} catch (IOException e) {
-				clients.remove(this);
+				e.printStackTrace();
 				System.out.println ("User Logout!");
 			}
 		}
@@ -113,10 +114,12 @@ public class Server {
 						groupSending(msgTemp);
 					} 
 					else if (className.equals("com.Common.ClientInfo")) {
+						
 						ClientInfo infoTemp = (ClientInfo)recvTemp;
 						//record this user
 						this.userName = infoTemp.getUserName();
 						this.ip = infoTemp.getIp();
+						System.out.println(this.userName + " " + this.ip);
 						clientInfos.add(infoTemp);
 						
 						//send this user's login info to other users
@@ -129,6 +132,7 @@ public class Server {
 				}
 			} catch (EOFException e) {
 				
+				//delete the logout user
 				for(int i = 0; i< clientInfos.size(); i++) {
 					ClientInfo temp  = clientInfos.get(i);
 					if (temp.getUserName().equals(this.userName))	
@@ -138,8 +142,7 @@ public class Server {
 				ClientInfoList cList = new ClientInfoList();
 				cList.setClientInfos(clientInfos);
 				groupSending(cList);
-				System.out.println("Client closed!");
-				
+				System.out.println("Client closed!");				
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (ClassNotFoundException e) {
@@ -147,6 +150,7 @@ public class Server {
 				e.printStackTrace();
 			} finally {
 				try {
+					clients.remove(this);
 					if (dis != null)	dis.close();
 					if (dos != null)	dos.close();
 					if (s != null) 		s.close();
