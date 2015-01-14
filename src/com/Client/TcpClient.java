@@ -9,6 +9,8 @@ import java.net.*;
 import java.util.ArrayList;
 
 import javax.swing.DefaultListModel;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 
 /*
  * TcpCLient used for user to connect to server for group chat
@@ -90,13 +92,13 @@ public class TcpClient {
 			//receive login lists of other members.
 			tRecvFromServer = new Thread(new RecvFromServerThread());
 			tRecvFromServer.start();
-			
-			System.out.println("connected!");
 					
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
+			return false;
 		} catch (IOException e) {
 			e.printStackTrace();
+			return false;
 		}
 		return true;
 	}
@@ -126,12 +128,17 @@ public class TcpClient {
 						Msg msgTemp = (Msg) recvTemp;
 						String msg = msgTemp.getMsg();
 						String sender = msgTemp.getMsgSender();
-						chatFrame.txtArea.setText(chatFrame.txtArea.getText() + sender + ":\n    " + msg + '\n');
+						
+						if (msg == null && sender == null) {	//the user's name is used
+							int re = JOptionPane.showConfirmDialog(null, "该用户名已被使用！","Message",JOptionPane.DEFAULT_OPTION,JOptionPane.ERROR_MESSAGE);
+							if (re == 0) System.exit(0);
+						}
+						else
+							chatFrame.txtArea.setText(chatFrame.txtArea.getText() + sender + ":\n    " + msg + '\n');
 					} 
 					else if (className.equals("com.Common.ClientInfoList")) {
 						ClientInfoList listTemp = (ClientInfoList)recvTemp;
 						infos = listTemp.getClientInfos();
-						
 						nameListModel.clear();
 						for(int i = 0; i<infos.size(); i++) 
 							nameListModel.addElement(infos.get(i).getUserName());

@@ -105,7 +105,6 @@ public class UdpClient {
 			oout.writeObject(obj);
 			oout.flush();
 			buffer = bout.toByteArray();
-			System.out.println(peerIp + "   " + port);
 			sendPacket = new DatagramPacket(buffer, buffer.length,InetAddress.getByName(peerIp),port);
 			dsSend.send(sendPacket);
 		} catch (IOException e1) {
@@ -182,7 +181,6 @@ public class UdpClient {
 								}
 							}
 							else {
-								System.out.println("Hello!");
 								SingleChatFrame tempChatFrame = groupChatFrame.addSingleChatFrame(userName, name, ip,false);
 								tempChatFrame.setPeerPort(info.getPort());	//set peer's port
 								

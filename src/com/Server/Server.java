@@ -8,6 +8,8 @@ import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
 
+import javax.swing.JOptionPane;
+
 
 public class Server {
 	boolean started = false;
@@ -19,6 +21,7 @@ public class Server {
 	ArrayList<ClientInfo> clientInfos = new ArrayList<ClientInfo>();		//user info list
 	
 	public static void main(String[] args) {
+		
 		new Server(8888);
 	}
 	
@@ -31,9 +34,10 @@ public class Server {
 		try {
 			ss = new ServerSocket(port);
 			started = true;
-			System.out.println("occupied port 8888");
+			JOptionPane.showMessageDialog(null, "服务端已开启！占用8888端口。");
 		} catch (BindException e) {
 			System.out.println("port being used!");
+			JOptionPane.showMessageDialog(null, "端口8888已被占用！服务器关闭...");
 			System.exit(0);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -71,7 +75,6 @@ public class Server {
 		public ClientOperation(Socket s) {
 			this.s = s;
 			try {
-				System.out.println("new dos and dis!");
 				dis = new ObjectInputStream(new BufferedInputStream(s.getInputStream()));
 				dos = new ObjectOutputStream(s.getOutputStream());
 				bConnected = true;
@@ -109,7 +112,6 @@ public class Server {
 						//console
 						String msg = msgTemp.getMsg();
 						String sender = msgTemp.getMsgSender();
-						System.out.println(sender + ": " + msg);
 						
 						groupSending(msgTemp);
 					} 
@@ -119,16 +121,25 @@ public class Server {
 						//record this user
 						this.userName = infoTemp.getUserName();
 						this.ip = infoTemp.getIp();
-						System.out.println(this.userName + " " + this.ip);
-						clientInfos.add(infoTemp);
+						boolean isRepeated = false;
+						for(int i = 0;i<clientInfos.size();i++) {
+							ClientInfo info = clientInfos.get(i);
+							if (info.getUserName().equals(userName)) { //The user has loged in
+								isRepeated = true;
+								Msg emptyMsg = new Msg();
+								sendObject(emptyMsg);
+							}
+						}
+						if (!isRepeated) {
+							clientInfos.add(infoTemp);
 						
-						//send this user's login info to other users
-						ClientInfoList cList = new ClientInfoList();
-						cList.setClientInfos(clientInfos);
+							//send this user's login info to other users
+							ClientInfoList cList = new ClientInfoList();
+							cList.setClientInfos(clientInfos);
 						
-						groupSending(cList);
+							groupSending(cList);
+						}
 					}
-					else System.out.println("unresolved type!");
 				}
 			} catch (EOFException e) {
 				
@@ -142,7 +153,6 @@ public class Server {
 				ClientInfoList cList = new ClientInfoList();
 				cList.setClientInfos(clientInfos);
 				groupSending(cList);
-				System.out.println("Client closed!");				
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (ClassNotFoundException e) {

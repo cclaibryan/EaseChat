@@ -65,7 +65,7 @@ public class LoginFrame extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				new GroupChatFrame(nameField.getText(),serverField.getText());
-				
+				setVisible(false);
 			}
 		});
 		

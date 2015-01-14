@@ -51,7 +51,12 @@ public class GroupChatFrame extends JFrame {
 		
 		//initiate the TcpClient
 		tcpClient = new TcpClient(userName, serverIp);
-		tcpClient.connect();
+		boolean re = tcpClient.connect();
+		
+		if (!re) {
+			int res = JOptionPane.showConfirmDialog(null, "无法连接到服务器！！","Message",JOptionPane.DEFAULT_OPTION,JOptionPane.ERROR_MESSAGE);
+			if (res == 0) System.exit(0);
+		}
 		tcpClient.setChatFrame(this);		
 		
 		//initiate for single chat
@@ -161,7 +166,6 @@ public class GroupChatFrame extends JFrame {
 	//add if a single chat frame is not initiated
 	//fetch if the single chat frame has been initiated
 	public SingleChatFrame addSingleChatFrame(String userName,String peerName, String peerIp,boolean isShown) {
-		System.out.println("num:" + singleChatFramesList.size());
 		for (int i = 0; i< singleChatFramesList.size(); i++) {
 			SingleChatFrame temp = singleChatFramesList.get(i);
 			if (temp.peerName.equals(peerName)) return temp;
